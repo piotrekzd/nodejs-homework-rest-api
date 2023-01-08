@@ -64,8 +64,6 @@ const updateContact = async (contactId, body) => {
   try {
     // const contacts = await listContacts();
     // const update = await contactToUpdate(contactId, body)
-    // const contactIndex = await contacts.find(({ id }) => id === contactId);
-    // const updatedContacts = await contacts.splice(contactIndex, 1, update);
     const contacts = await listContacts();
     const { name, email, phone } = body;
     const [contactToUpdate] = await contacts.filter(({ id }) => id === contactId);
