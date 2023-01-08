@@ -47,18 +47,38 @@ const addContact = async (body) => {
   };
 };
 
-// const updateContact = async (contactId, body) => {
+// const contactToUpdate = async (contactId, body) => {
 //   try {
 //     const contacts = await listContacts();
-//     const requestedContact = await getContactById(contactId);
 //     const { name, email, phone } = body;
-//     const resolveUpdate = async (name, email, phone) => {
-
-//     }
+//     const [contactToUpdate] = contacts.filter(({ id }) => id === contactId);
+//     contactToUpdate.name = name;
+//     contactToUpdate.email = email;
+//     contactToUpdate.phone = phone;
 //   } catch (error) {
 //     console.log(error.message);
 //   };
 // };
+
+const updateContact = async (contactId, body) => {
+  try {
+    // const contacts = await listContacts();
+    // const update = await contactToUpdate(contactId, body)
+    // const contactIndex = await contacts.find(({ id }) => id === contactId);
+    // const updatedContacts = await contacts.splice(contactIndex, 1, update);
+    const contacts = await listContacts();
+    const { name, email, phone } = body;
+    const [contactToUpdate] = await contacts.filter(({ id }) => id === contactId);
+    contactToUpdate.name = name;
+    contactToUpdate.email = email;
+    contactToUpdate.phone = phone;
+    const contactIndex = await contacts.findIndex(({ id }) => id === contactId);
+    const updatedContacts = await contacts.splice(contactIndex, 1, contactToUpdate);
+    await fs.writeFile(contactsPath, JSON.stringify(updatedContacts, null, 2), { encoding: 'utf-8' });   
+  } catch (error) {
+    console.log(error.message);
+  };
+}; // do dokończenia! wywala 
 
 const removeContact = async (contactId) => {
   try {
@@ -75,6 +95,7 @@ module.exports = {
   getContactById,
   createNewContact,
   addContact,
-  // updateContact,
+  // contactToUpdate,
+  updateContact,
   removeContact,
 };
