@@ -61,8 +61,14 @@
   },
   {
     "id": "11",
-    "name": "Maniek",
-    "email": "janusz@janusz.com",
-    "phone": "566655"
+    "name": "Miras Trzy",
+    "email": "miras@janusz.com",
+    "phone": "56665-666"
+  },
+  {
+    "id": "12",
+    "name": "Miras Cztery",
+    "email": "miras@janusz.com",
+    "phone": "56665-666"
   }
 ]

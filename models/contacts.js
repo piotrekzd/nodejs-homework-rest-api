@@ -25,10 +25,9 @@ const getContactById = async (contactId) => {
 
 const createNewContact = async (body) => {
   try {
-    const { name, email, phone } = body;
     const contacts = await listContacts();
     const newId = Math.max(...contacts.map(contact => parseInt(contact.id, 10))) + 1;
-    const newContact = { id: newId.toString(), name, email, phone };
+    const newContact = { id: newId.toString(), ...body };
     return newContact;
   } catch (error) {
     console.log(error.message);
@@ -47,36 +46,16 @@ const addContact = async (body) => {
   };
 };
 
-// const contactToUpdate = async (contactId, body) => {
-//   try {
-//     const contacts = await listContacts();
-//     const { name, email, phone } = body;
-//     const [contactToUpdate] = contacts.filter(({ id }) => id === contactId);
-//     contactToUpdate.name = name;
-//     contactToUpdate.email = email;
-//     contactToUpdate.phone = phone;
-//   } catch (error) {
-//     console.log(error.message);
-//   };
-// };
-
 const updateContact = async (contactId, body) => {
   try {
-    // const contacts = await listContacts();
-    // const update = await contactToUpdate(contactId, body)
     const contacts = await listContacts();
-    const { name, email, phone } = body;
-    const [contactToUpdate] = await contacts.filter(({ id }) => id === contactId);
-    contactToUpdate.name = name;
-    contactToUpdate.email = email;
-    contactToUpdate.phone = phone;
     const contactIndex = await contacts.findIndex(({ id }) => id === contactId);
-    const updatedContacts = await contacts.splice(contactIndex, 1, contactToUpdate);
-    await fs.writeFile(contactsPath, JSON.stringify(updatedContacts, null, 2), { encoding: 'utf-8' });   
+    contacts[contactIndex] = { ...contacts[contactIndex], ...body };
+    await fs.writeFile(contactsPath, JSON.stringify(contacts), { encoding: 'utf-8' });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
   };
-}; // do dokończenia! wywala 
+};
 
 const removeContact = async (contactId) => {
   try {
@@ -93,7 +72,6 @@ module.exports = {
   getContactById,
   createNewContact,
   addContact,
-  // contactToUpdate,
   updateContact,
   removeContact,
 };
