@@ -16,7 +16,7 @@ const getAll = async (req, res, next) => {
     };
 };
 
-const reqister = async (req, res, next) => {
+const register = async (req, res, next) => {
     const { error } = userValidator(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
     const { email, password, subscription } = req.body;
@@ -119,7 +119,7 @@ const current = async (req, res, next) => {
 
 module.exports = {
     getAll,
-    reqister,
+    register,
     login,
     logout,
     current
