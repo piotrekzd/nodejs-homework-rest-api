@@ -42,6 +42,6 @@ userSchema.methods.setToken = function (token) {
     this.token = token;
 };
 
-const User = model.('user', userSchema);
+const User = model('user', userSchema);
 
 module.exports = { User };
