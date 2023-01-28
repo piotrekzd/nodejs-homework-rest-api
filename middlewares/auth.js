@@ -1,8 +1,6 @@
 const passport = require('passport');
 const passportJWT = require('passport-jwt');
-const { param } = require('../routes/api/contacts');
 const User = require('../service/schemas/user');
-const { userValidator } = require('../utils/validator/validator');
 require('dotenv').config();
 const secret = process.env.JWT_SECRET;
 
