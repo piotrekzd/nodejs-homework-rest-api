@@ -4,9 +4,9 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
-const dbUri = process.env.DB_HOST;
+const DB_HOST = process.env.DB_HOST;
 
-const connection = mongoose.connect(dbUri, {
+const connection = mongoose.connect(DB_HOST, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
