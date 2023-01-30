@@ -13,8 +13,10 @@ const validator = (schema) => (body) => {
 const contactsValidator = validator(contactSchema);
 
 const userSchema = joi.object({
+    password: joi.string(),
     email: joi.string().email(),
-    password: joi.string()
+    subscription: joi.string(),
+    token: joi.string()
 });
 
 const userValidator = validator(userSchema)

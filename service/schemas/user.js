@@ -22,10 +22,6 @@ const userSchema = new Schema(
             type: String,
             default: null,
         },
-        owner: {
-            type: Schema.Types.ObjectId,
-            ref: 'user'
-        }
     },
     { versionKey: false, timestamps: true }
 );
@@ -42,6 +38,6 @@ userSchema.methods.setToken = function (token) {
     this.token = token;
 };
 
-const User = model('user', userSchema);
+const User = model('User', userSchema, 'users');
 
-module.exports = { User };
+module.exports = User;

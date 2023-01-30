@@ -19,7 +19,7 @@ const getAll = async (req, res, next) => {
 const register = async (req, res, next) => {
     const { error } = userValidator(req.body);
     if (error) return res.status(400).json({ message: error.details[0].message });
-    const { email, password, subscription } = req.body;
+    const { password, email} = req.body;
     const user = await service.getUser({ email });
     if (user) return res.status(409).json({
         status: 'error',
@@ -29,9 +29,9 @@ const register = async (req, res, next) => {
     });
 
     try {
-        const newUser = new User({ email, password, subscription });
+        const newUser = new User({ email });
         newUser.setPassword(password);
-        await newUser.save()
+        await newUser.save();
         res.status(201).json({
             status: 'success',
             code: 201,
@@ -61,7 +61,7 @@ const login = async (req, res, next) => {
 
     try {
         const payload = {
-            id: user.id,
+            id: user._id,
             email: user.email
         };
 
