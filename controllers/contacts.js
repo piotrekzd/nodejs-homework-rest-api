@@ -15,7 +15,7 @@ const getById = async (req, res, next) => {
         const { contactId } = req.params;
         const contact = await service.getContactById(contactId);
         if (!contact) return res.status(404).json({ message: 'Contact not found' });
-        if (contact) return res.status(200).json({ requestedContact: contact });
+        if (contact) return res.status(200).json({ contact });
     } catch (error) {
         console.log(error.message);
         next(error);

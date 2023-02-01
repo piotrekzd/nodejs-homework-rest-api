@@ -26,10 +26,7 @@ const auth = (req, res, next) => {
     passport.authenticate('jwt', { session: false }, (user, error) => {
         if (!user || error) {
             return res.status(401).json({
-                // status: 'error',
-                // code: 401,
                 message: 'Unauthorized',
-                // data: 'Unauthorized'
             });
         };
         req.user = user;
