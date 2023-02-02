@@ -18,7 +18,7 @@ router.post('/', addContact);
 
 router.put('/:contactId', updateContact);
 
-router.patch('/:contactId', addFavourite);
+router.patch('/:contactId/favourite', addFavourite);
 
 router.delete('/:contactId', remove);
 
