@@ -1,5 +1,7 @@
 const app = require('./app');
 const mongoose = require('mongoose');
+const { createFolder } = require('./utils/createFolder/createFolder');
+const { tempDir, avatarDir } = require('./middlewares/imgUpload');
 
 require('dotenv').config();
 
@@ -13,7 +15,9 @@ const connection = mongoose.connect(DB_HOST, {
 
 connection
   .then(() => {
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
+      await createFolder(tempDir);
+      await createFolder(avatarDir);
       console.log(`\nDatabese is running on the PORT: ${PORT}`)
     });
   })

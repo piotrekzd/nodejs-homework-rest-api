@@ -72,9 +72,7 @@ const login = async (req, res, next) => {
         };
 
         const token = jwt.sign(payload, secret, { expiresIn: '1h' });
-        // user.setToken(token);
-        // await user.save();
-        await service.updateUser(user.id, { token });
+        await service.updateUser(user._id, { token });
         res.json({
             status: 'success',
             code: 200,
@@ -88,11 +86,10 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        const user = await service.getUser({ _id: req.user._id });
+        const { token } = req.user;
+        const user = await service.getUser({ token });
         if (!user) return res.status(401).json({ message: 'Not authorized' });
-        // user.setToken(null);
-        // await user.save();
-        await service.updateUser(user.id, { token: null });
+        await service.updateUser(user._id, { token: null });
         res.json({
             status: 'success',
             code: 204,
@@ -106,12 +103,15 @@ const logout = async (req, res, next) => {
 
 const current = async (req, res, next) => {
     try {
-        const user = await service.getUser({  _id: req.user._id });
+        const { email, subscription, token, avatarURL } = req.user;
+        const user = await service.getUser({ token });
         if (!user) return res.status(401).json({ message: 'Not found' });
         res.json({
             status: 'success',
             code: 200,
-            user
+            email,
+            subscription,
+            avatarURL
         });
     } catch (error) {
         console.log(error.message);
@@ -127,7 +127,7 @@ const updateSubscription = async (req, res, next) => {
         const { subscription } = req.body;
         const user = await service.getUser({ _id: req.user._id });
         if (!user) return res.status(401).json({ message: 'Not authorized' });
-        const updatedUser = await service.updateUser(user.id, { subscription });
+        const updatedUser = await service.updateUser(user._id, { subscription });
         res.json({
             status: 'success',
             code: 200,
