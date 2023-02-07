@@ -1,7 +1,12 @@
-const service = require('../service/users');
+const fs = require('fs/promises');
+const path = require('path');
 const jwt = require('jsonwebtoken');
+const gravatar = require('gravatar');
+const service = require('../service/users');
 const User = require('../service/schemas/user');
 const { userValidator } = require('../utils/validator/validator');
+const { avatarDir } = require('../middlewares/imgUpload');
+const { resizeAvatar } = require('../utils/imgEditor/resizeAvatar');
 require('dotenv').config();
 
 const secret = process.env.JWT_SECRET;
@@ -29,7 +34,8 @@ const register = async (req, res, next) => {
     });
 
     try {
-        const newUser = new User({ email });
+        const avatarURL = gravatar.url(email, { s: '250', d: 'mp' });
+        const newUser = new User({ email, avatarURL });
         newUser.setPassword(password);
         await newUser.save();
         res.status(201).json({
@@ -61,19 +67,16 @@ const login = async (req, res, next) => {
 
     try {
         const payload = {
-            id: user._id,
+            id: user.id,
             email: user.email
         };
 
         const token = jwt.sign(payload, secret, { expiresIn: '1h' });
-        user.setToken(token);
-        await user.save();
+        await service.updateUser(user._id, { token });
         res.json({
             status: 'success',
             code: 200,
-            data: {
-                token
-            }
+            token
         });
     } catch (error) {
         console.log(error.message);
@@ -83,16 +86,14 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
     try {
-        const user = await service.getUser({ _id: req.user.id });
+        const { token } = req.user;
+        const user = await service.getUser({ token });
         if (!user) return res.status(401).json({ message: 'Not authorized' });
-        user.setToken(null);
-        await user.save();
+        await service.updateUser(user._id, { token: null });
         res.json({
             status: 'success',
             code: 204,
-            data: {
-                message: 'No content'
-            }
+            message: 'No content'
         });
     } catch (error) {
         console.log(error.message);
@@ -102,14 +103,59 @@ const logout = async (req, res, next) => {
 
 const current = async (req, res, next) => {
     try {
-        const user = await service.getUser({ _id: req.user.id });
+        const { email, subscription, token, avatarURL } = req.user;
+        const user = await service.getUser({ token });
         if (!user) return res.status(401).json({ message: 'Not found' });
         res.json({
             status: 'success',
             code: 200,
-            data: {
-                user
-            }
+            email,
+            subscription,
+            avatarURL
+        });
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    };
+};
+
+const updateSubscription = async (req, res, next) => {
+    const { error } = userValidator(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    try {
+        const { subscription } = req.body;
+        const user = await service.getUser({ _id: req.user._id });
+        if (!user) return res.status(401).json({ message: 'Not authorized' });
+        const updatedUser = await service.updateUser(user._id, { subscription });
+        res.json({
+            status: 'success',
+            code: 200,
+            updatedUser
+        });
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    };
+};
+
+const updateAvatar = async (req, res, next) => {
+    const { error } = userValidator(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
+    try {
+        const { path: tmpPath, filename } = req.file;
+        const avatarURL = path.join(avatarDir, filename);
+        resizeAvatar(tmpPath, avatarURL);
+        await fs.unlink(tmpPath);
+
+        const user = service.getUser({ _id: req.user._id });
+        if (!user) return res.status(401).json({ message: 'Not authorized' });
+        const updatedUser = await service.updateUser(user.id, { avatarURL });
+        res.json({
+            status: 'success',
+            code: 200,
+            updatedUser
         });
     } catch (error) {
         console.log(error.message);
@@ -122,5 +168,7 @@ module.exports = {
     register,
     login,
     logout,
-    current
+    current,
+    updateSubscription,
+    updateAvatar
 };
