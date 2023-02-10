@@ -8,7 +8,9 @@ const {
     current,
     updateSubscription,
     updateAvatar,
-    getAll
+    getAll,
+    sendEmailConfirmation,
+    resendEmailConfirmation
 } = require('../../controllers/users');
 
 const router = express.Router();
@@ -25,10 +27,10 @@ router.get('/logout', auth, logout);
 
 router.get('/current', auth, current);
 
-router.post('/verify');
+router.post('/verify', sendEmailConfirmation);
 
-router.get('/verify:verificationToken');
-
+router.get('/verify:verificationToken', resendEmailConfirmation);
+    
 router.get('/', auth, getAll);
 
 module.exports = router;
