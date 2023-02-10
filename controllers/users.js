@@ -8,7 +8,7 @@ const { v4 } = require('uuid');
 const { userValidator } = require('../utils/validator/validator');
 const { avatarDir } = require('../middlewares/imgUpload');
 const { resizeAvatar } = require('../utils/imgEditor/resizeAvatar');
-const { verifyEmail } = require('../utils/verifyEmail/verifyEmail');
+const { sendVerificationLink } = require('../utils/verifyEmail/verifyEmail');
 
 require('dotenv').config();
 
@@ -38,11 +38,11 @@ const register = async (req, res, next) => {
 
     try {
         const avatarURL = gravatar.url(email, { s: '250', d: 'mp' });
-        const token = v4();
+        const verificationToken = v4();
         const newUser = new User({ email, avatarURL, verificationToken });
         newUser.setPassword(password);
         await newUser.save();
-        await verifyEmail(email, verificationToken);
+        await sendVerificationLink(email, verificationToken);
         
         res.status(201).json({
             status: 'success',

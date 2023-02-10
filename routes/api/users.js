@@ -27,7 +27,7 @@ router.get('/logout', auth, logout);
 
 router.get('/current', auth, current);
 
-router.get('/verify:verificationToken', sendEmailConfirmation);
+router.get('/verify/:verificationToken', sendEmailConfirmation);
 
 router.post('/verify', resendEmailConfirmation);
 
