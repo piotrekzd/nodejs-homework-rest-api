@@ -25,6 +25,10 @@ router.get('/logout', auth, logout);
 
 router.get('/current', auth, current);
 
+router.post('/verify');
+
+router.get('/verify:verificationToken');
+
 router.get('/', auth, getAll);
 
 module.exports = router;
