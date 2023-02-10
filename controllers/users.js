@@ -191,6 +191,9 @@ const resendEmailConfirmation = async (req, res, next) => {
         const user = service.getUser({ email });
         if (!user) res.status(404).json({ message: 'Not found' });
         if (user.verify) res.status(400).json({ message: 'Already verified', data: 'Bad request' });
+
+        await sendEmailConfirmation(email, user.verificationToken);
+        res.status(200).json({ message: 'Verification email has been sent' });
     } catch (error) {
         console.log(error.message);
         next(error);
