@@ -27,10 +27,10 @@ router.get('/logout', auth, logout);
 
 router.get('/current', auth, current);
 
-router.post('/verify', sendEmailConfirmation);
+router.get('/verify:verificationToken', sendEmailConfirmation);
 
-router.get('/verify:verificationToken', resendEmailConfirmation);
-    
+router.post('/verify', resendEmailConfirmation);
+
 router.get('/', auth, getAll);
 
 module.exports = router;
