@@ -4,9 +4,12 @@ const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const service = require('../service/users');
 const User = require('../service/schemas/user');
+const { v4 } = require('uuid');
 const { userValidator } = require('../utils/validator/validator');
 const { avatarDir } = require('../middlewares/imgUpload');
 const { resizeAvatar } = require('../utils/imgEditor/resizeAvatar');
+const { verifyEmail } = require('../utils/verifyEmail/verifyEmail');
+
 require('dotenv').config();
 
 const secret = process.env.JWT_SECRET;
@@ -35,14 +38,19 @@ const register = async (req, res, next) => {
 
     try {
         const avatarURL = gravatar.url(email, { s: '250', d: 'mp' });
-        const newUser = new User({ email, avatarURL });
+        const token = v4();
+        const newUser = new User({ email, avatarURL, verificationToken });
         newUser.setPassword(password);
         await newUser.save();
+        await verifyEmail(email, verificationToken);
+        
         res.status(201).json({
             status: 'success',
             code: 201,
             data: {
-                message: 'Registered uccessfully'
+                message: 'Registered uccessfully',
+                email,
+                verificationToken
             }
         });
     } catch (error) {
@@ -163,6 +171,32 @@ const updateAvatar = async (req, res, next) => {
     };
 };
 
+const sendEmailConfirmation = async (req, res, next) => {
+    const { verificationToken } = req.params;
+
+    try {
+        const user = service.verifyToken(verificationToken);
+        if (!user) res.status(404).json({ message: 'Not found' });
+        res.status(200).json({ message: 'Verification successful' });
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    };
+};
+
+const resendEmailConfirmation = async (req, res, next) => {
+    const { email } = req.body;
+
+    try {
+        const user = service.getUser({ email });
+        if (!user) res.status(404).json({ message: 'Not found' });
+        if (user.verify) res.status(400).json({ message: 'Already verified', data: 'Bad request' });
+    } catch (error) {
+        console.log(error.message);
+        next(error);
+    };
+};
+
 module.exports = {
     getAll,
     register,
@@ -170,5 +204,7 @@ module.exports = {
     logout,
     current,
     updateSubscription,
-    updateAvatar
+    updateAvatar,
+    sendEmailConfirmation,
+    resendEmailConfirmation
 };

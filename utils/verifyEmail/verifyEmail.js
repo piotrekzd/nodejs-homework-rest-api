@@ -3,10 +3,10 @@ require('dotenv').config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-const msg = (email, token) => {
+const msg = ({ email, from = 'piotrek.zdebski@gmail.com', token }) => {
     return {
         to: { email },
-        from: 'piotrek.zdebski@gmail.com',
+        from,
         subject: 'Verification link',
         text: 'Click on the link to verify your email address   ',
         html: `<strong>Click:<a href="${`http://localhost:3000/api/users/verify/${token}`}">here</a>to confirm your email address</strong>`,
