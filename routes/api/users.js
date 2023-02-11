@@ -8,7 +8,9 @@ const {
     current,
     updateSubscription,
     updateAvatar,
-    getAll
+    getAll,
+    sendEmailConfirmation,
+    resendEmailConfirmation
 } = require('../../controllers/users');
 
 const router = express.Router();
@@ -24,6 +26,10 @@ router.patch('/avatars', auth, upload.single('avatar'), updateAvatar);
 router.get('/logout', auth, logout);
 
 router.get('/current', auth, current);
+
+router.get('/verify/:verificationToken', sendEmailConfirmation);
+
+router.post('/verify', resendEmailConfirmation);
 
 router.get('/', auth, getAll);
 
